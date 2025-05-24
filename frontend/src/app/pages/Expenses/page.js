@@ -34,7 +34,6 @@ export default function Page() {
       setIsAuthenticated(true);
    }, [router]);
 
-   // Helper function for API calls
    const makeRequest = async (method, endpoint, data = null) => {
       const token = getCookie('Token');
       try {

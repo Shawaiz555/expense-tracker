@@ -28,7 +28,6 @@ export default function Page() {
       autoDeduct: false,
    });
 
-   // Helper function for API calls
    const makeRequest = async (method, endpoint, data = null) => {
       const token = getCookie('Token');
       try {
@@ -567,10 +566,6 @@ export default function Page() {
             </details>
          </div>
 
-
-         Here's the next section of Part 2 (UI Component), continuing directly:
-
-```jsx
          {/* Header */}
          <div className="flex justify-between items-center bg-white border border-gray-300 shadow-lg py-6 px-8 rounded-2xl text-primary mb-8">
             <h1 className="xs:text-xl sm:text-2xl lg:text-3xl text-primary font-bold">Recurring Expenses</h1>

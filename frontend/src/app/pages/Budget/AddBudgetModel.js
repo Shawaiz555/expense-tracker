@@ -21,7 +21,6 @@ export default function AddBudgetModal({ setShowModal, setBudget, makeRequest })
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate no empty fields
     const hasEmptyFields = Object.values(form).some((value) => value === '');
     if (hasEmptyFields) {
       alert("Please fill out all fields.");
@@ -41,7 +40,7 @@ export default function AddBudgetModal({ setShowModal, setBudget, makeRequest })
         // Fetch the updated budget list after adding
         const getBudgetResponse = await makeRequest('get', '/budget/getAllBudgets');
         if (getBudgetResponse.allBudgets && getBudgetResponse.allBudgets.length > 0) {
-          setBudget(getBudgetResponse.allBudgets[0]); // Get the first budget
+          setBudget(getBudgetResponse.allBudgets[0]);
         }
         setShowModal(false);
       } else {

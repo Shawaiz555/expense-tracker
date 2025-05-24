@@ -14,7 +14,6 @@ export default function Page() {
   const [budget, setBudget] = useState(null);
   const [isBudgetAdded, setIsBudgetAdded] = useState(false);
 
-  // Helper function for API calls
   const makeRequest = async (method, endpoint, data = null) => {
     const token = getCookie('Token');
     try {
@@ -49,7 +48,6 @@ export default function Page() {
       try {
         const response = await makeRequest('get', '/budget/getAllBudgets');
         if (response.allBudgets && response.allBudgets.length > 0) {
-          // Get the first budget since we're only handling one
           setBudget(response.allBudgets[0]);
           setIsBudgetAdded(true);
         } else {
@@ -159,7 +157,7 @@ export default function Page() {
           setShowModal={setShowModal}
           setBudget={setBudget}
           budget={budget}
-          makeRequest={makeRequest} // Pass makeRequest to modal
+          makeRequest={makeRequest}
         />
       )}
 
@@ -169,7 +167,7 @@ export default function Page() {
           setBudget(newBudget);
           setIsBudgetAdded(newBudget.length > 0);
         }}
-        makeRequest={makeRequest} // Pass makeRequest to cards
+        makeRequest={makeRequest}
       />
     </div>
   );

@@ -32,7 +32,6 @@ export default function Dashboard() {
    const [scatterData, setScatterData] = useState({ datasets: [] });
    const [pieData, setPieData] = useState({ labels: [], datasets: [{ data: [], backgroundColor: [] }] });
 
-   // Helper function for API calls
    const makeRequest = async (method, endpoint, data = null) => {
       const token = getCookie('Token');
       try {
