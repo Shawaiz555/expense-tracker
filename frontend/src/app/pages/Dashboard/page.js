@@ -13,12 +13,20 @@ import {
    ArcElement,
    Title,
    Tooltip,
-   Legend
+   Legend,
+   CategoryScale,
+   LineElement,
 } from 'chart.js';
 
-import { Pie, Scatter } from 'react-chartjs-2';
+import { Pie, Scatter, Line } from 'react-chartjs-2';
 
-ChartJS.register(PointElement, LinearScale, Title, Tooltip, Legend);
+ChartJS.register(CategoryScale,
+   LinearScale,
+   PointElement,
+   LineElement,
+   Title,
+   Tooltip,
+   Legend);
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 const API_BASE_URL = 'http://localhost:5000';
@@ -31,6 +39,19 @@ export default function Dashboard() {
    const [expenses, setExpenses] = useState([]);
    const [scatterData, setScatterData] = useState({ datasets: [] });
    const [pieData, setPieData] = useState({ labels: [], datasets: [{ data: [], backgroundColor: [] }] });
+
+   const [isMobile, setIsMobile] = useState(false);
+
+   useEffect(() => {
+      const checkMobile = () => {
+         setIsMobile(window.innerWidth < 768);
+      };
+      
+      checkMobile();
+      window.addEventListener('resize', checkMobile);
+      
+      return () => window.removeEventListener('resize', checkMobile);
+   }, []);
 
    const makeRequest = async (method, endpoint, data = null) => {
       const token = getCookie('Token');
@@ -71,7 +92,6 @@ export default function Dashboard() {
             const recurringRes = await makeRequest('get', '/recurringExpense/getAllRecurringExpenses');
             const recurringExpenses = recurringRes.allRecurringExpenses || [];
             setRecurringExpenses(recurringExpenses);
-
             prepareScatterData(regularExpenses);
             preparePieData(regularExpenses);
          } catch (error) {
@@ -199,29 +219,56 @@ export default function Dashboard() {
 
    const scatterOptions = {
       responsive: true,
+      maintainAspectRatio: false,
       plugins: {
          legend: {
             position: 'bottom',
+            labels: {
+               boxWidth: 10,
+               padding: 10,
+               font: {
+                  size: isMobile ? 10 : 12
+               }
+            }
          },
          title: {
             display: true,
-            text: 'Expenses: Daily, Weekly, Monthly, Yearly',
-         },
+            text: 'Expenses Overview',
+            font: {
+               size: isMobile ? 14 : 16
+            }
+         }
       },
       scales: {
          x: {
             title: {
                display: true,
-               text: 'Time Period Index',
+               text: 'Time Period',
+               font: {
+                  size: isMobile ? 10 : 12
+               }
             },
+            ticks: {
+               font: {
+                  size: isMobile ? 8 : 10
+               }
+            }
          },
          y: {
             title: {
                display: true,
-               text: 'Expense($)',
+               text: 'Amount ($)',
+               font: {
+                  size: isMobile ? 10 : 12
+               }
             },
-         },
-      },
+            ticks: {
+               font: {
+                  size: isMobile ? 8 : 10
+               }
+            }
+         }
+      }
    };
 
    const pieOptions = {
@@ -240,8 +287,8 @@ export default function Dashboard() {
          </div>
          <div className="w-full h-full px-2 md:px-7 mt-8">
             <div className='w-full flex flex-col justify-center gap-10 lg:gap-2 lg:flex-row mt-10'>
-               <div className="w-full h-full lg:min-h-max bg-gray-150 border border-gray-300 flex justify-center lg:w-[60%] py-5 lg:p-4 lg:py-10 rounded-xl shadow-xl">
-                  <Scatter data={scatterData} options={scatterOptions} />
+               <div className="w-full h-[300px] md:h-[450px] bg-gray-150 border border-gray-300 flex justify-center lg:w-[60%] py-5 lg:p-4 lg:py-10 rounded-xl shadow-xl">
+                  <Scatter data={scatterData} options={scatterOptions} />                  
                </div>
                <div className='w-full lg:w-[40%] flex justify-center'>
                   <Pie data={pieData} options={pieOptions} />
@@ -251,7 +298,7 @@ export default function Dashboard() {
             <div className="w-full flex flex-col lg:flex-row gap-5 py-14">
                {/* Regular Expenses */}
                <div className="w-full lg:w-1/2">
-                  <div className="bg-white rounded-3xl shadow-lg p-5">
+                  <div className="rounded-3xl shadow-lg p-5">
                      <div className="flex justify-between items-center mb-5">
                         <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">Regular Expenses</h1>
                         <select
@@ -268,7 +315,7 @@ export default function Dashboard() {
 
                      <div className="w-full overflow-x-auto custom-scroll">
                         <div className="min-w-[950px]">
-                           <table className="w-full border border-gray-200 bg-white text-center rounded-xl">
+                           <table className="w-full border border-gray-200 text-center rounded-xl">
                               <thead className="bg-primary text-white">
                                  <tr>
                                     <th className="px-6 py-3 text-md font-bold whitespace-nowrap">ID</th>
@@ -291,11 +338,11 @@ export default function Dashboard() {
                                              transition={{ duration: 0.3 }}
                                              className="hover:bg-gray-50 border-t border-gray-200"
                                           >
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{index + 1}</td>
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{item.category}</td>
-                                             <td className="px-6 py-5 text-green-600 font-semibold text-sm">${item.amount}</td>
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{new Date(item.date).toLocaleDateString()}</td>
-                                             <td className="px-6 py-5 text-gray-700 text-sm text-left max-w-[250px]">{item.description}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{index + 1}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{item.category}</td>
+                                             <td className="px-6 py-4 text-green-600 font-semibold text-sm">${item.amount}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{new Date(item.date).toLocaleDateString()}</td>
+                                             <td className="px-6 py-4 text-gray-700 text-sm text-left max-w-[250px]">{item.description}</td>
                                           </motion.tr>
                                        ))}
                                  </AnimatePresence>
@@ -308,7 +355,7 @@ export default function Dashboard() {
 
                {/* Recurring Expenses */}
                <div className="w-full lg:w-1/2">
-                  <div className="bg-white rounded-3xl shadow-lg p-5">
+                  <div className="rounded-3xl shadow-lg p-5">
                      <div className="flex justify-between items-center mb-5">
                         <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-primary">Recurring Expenses</h1>
                         <select
@@ -347,10 +394,10 @@ export default function Dashboard() {
                                              transition={{ duration: 0.3 }}
                                              className="hover:bg-gray-50 border-t border-gray-200"
                                           >
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{index + 1}</td>
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{item.category}</td>
-                                             <td className="px-6 py-5 text-green-600 font-semibold text-sm">${item.amount}</td>
-                                             <td className="px-6 py-5 text-gray-800 text-sm">{new Date(item.nextDueDate).toLocaleDateString()}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{index + 1}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{item.category}</td>
+                                             <td className="px-6 py-4 text-green-600 font-semibold text-sm">${item.amount}</td>
+                                             <td className="px-6 py-4 text-gray-800 text-sm">{new Date(item.nextDueDate).toLocaleDateString()}</td>
                                           </motion.tr>
                                        ))}
                                  </AnimatePresence>
